@@ -5,10 +5,10 @@ Gem::Specification.new do |s|
   s.version = "1.7.0"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Nat Budin", "Jeremy Haile"]
+  s.authors = ["Nat Budin", "Jeremy Haile", "Ketan Ghumatkar"]
   s.description = %q{CAS authentication module for Devise}
   s.license = "MIT"
-  s.email = %q{natbudin@gmail.com}
+  s.email = %q{ketanghumatkar@gmail.com}
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
-  s.homepage = %q{http://github.com/nbudin/devise_cas_authenticatable}
+  s.homepage = %q{https://github.com/Treeni/devise_cas_authenticatable}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.5.0}
   s.summary = %q{CAS authentication module for Devise}

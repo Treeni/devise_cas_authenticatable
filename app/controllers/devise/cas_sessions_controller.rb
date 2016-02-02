@@ -1,4 +1,4 @@
-class Devise::CasSessionsController < Devise::SessionsController
+class Devise::CasSessionsController < Users::SessionsController
   include DeviseCasAuthenticatable::SingleSignOut::DestroySession
 
   unless Rails.version =~/^4/
@@ -7,8 +7,39 @@ class Devise::CasSessionsController < Devise::SessionsController
 
   skip_before_filter :verify_authenticity_token, :only => [:single_sign_out]
 
-  def new
-    redirect_to(cas_login_url)
+  if Settings.cas_enable
+    # def new
+    #     redirect_to(cas_login_url)
+    # end
+
+    def create
+      resp = HTTP.post('http://localhost:8888/loginTicket', form: {})
+      lt = resp.body
+      resp = HTTP.post('http://localhost:8888/customLogin?service=http%3A%2F%2Flocalhost%3A3000%2Fusers%2Fservice', :form => { username: params[:user][:email], password: params[:user][:password], lt: lt })
+
+      # response.set_cookie "tgt", resp.body.tgt
+      if resp.status == 401 or resp.status == 500
+        render json: JSON.parse(resp.body).to_json, status: resp.status
+      else
+        render json: JSON.parse(resp.body).to_json
+      end
+    end
+
+    def destroy
+      # if :cas_create_user is false a CAS session might be open but not signed_in
+      # in such case we destroy the session here
+      if signed_in?(resource_name)
+        sign_out(resource_name)
+      else
+        reset_session
+      end
+
+      redirect_to(cas_logout_url)
+    end
+  else
+    def create
+      super
+    end
   end
 
   def service
@@ -16,18 +47,6 @@ class Devise::CasSessionsController < Devise::SessionsController
   end
 
   def unregistered
-  end
-
-  def destroy
-    # if :cas_create_user is false a CAS session might be open but not signed_in
-    # in such case we destroy the session here
-    if signed_in?(resource_name)
-      sign_out(resource_name)
-    else
-      reset_session
-    end
-
-    redirect_to(cas_logout_url)
   end
 
   def single_sign_out
